@@ -16,14 +16,15 @@ export const BackgroundGradientAnimation = ({
   children,
   className,
   interactive = true,
-  containerClassName
+  containerClassName,
 }) => {
   const interactiveRef = useRef(null);
-
-  const [curX, setCurX] = useState(0);
-  const [curY, setCurY] = useState(0);
+  
   const [tgX, setTgX] = useState(0);
   const [tgY, setTgY] = useState(0);
+  const curX = useRef(0);
+  const curY = useRef(0);
+
   useEffect(() => {
     document.body.style.setProperty("--gradient-background-start", gradientBackgroundStart);
     document.body.style.setProperty("--gradient-background-end", gradientBackgroundEnd);
@@ -38,23 +39,29 @@ export const BackgroundGradientAnimation = ({
   }, []);
 
   useEffect(() => {
-    function move() {
-      if (!interactiveRef.current) {
-        return;
-      }
-      setCurX(curX + (tgX - curX) / 5);
-      setCurY(curY + (tgY - curY) / 5);
-      interactiveRef.current.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
-    }
+    let animationFrameId;
 
-    move();
+    const move = () => {
+      if (!interactiveRef.current) return;
+
+      // Smooth interpolation (lerp)
+      curX.current += (tgX - curX.current) * 0.1;
+      curY.current += (tgY - curY.current) * 0.1;
+
+      interactiveRef.current.style.transform = `translate(${Math.round(curX.current)}px, ${Math.round(curY.current)}px)`;
+
+      animationFrameId = requestAnimationFrame(move);
+    };
+
+    animationFrameId = requestAnimationFrame(move);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [tgX, tgY]);
 
   const handleMouseMove = (event) => {
     if (interactiveRef.current) {
       const rect = interactiveRef.current.getBoundingClientRect();
-      setTgX(event.clientX - rect.left);
-      setTgY(event.clientY - rect.top);
+      setTgX(event.clientX - rect.width / 2);
+      setTgY(event.clientY - rect.height / 2);
     }
   };
 
@@ -68,7 +75,9 @@ export const BackgroundGradientAnimation = ({
       className={cn(
         "h-screen w-screen relative overflow-hidden top-0 left-0 bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
         containerClassName
-      )}>
+      )}
+      onMouseMove={handleMouseMove}
+    >
       <svg className="hidden">
         <defs>
           <filter id="blurMe">
@@ -77,7 +86,8 @@ export const BackgroundGradientAnimation = ({
               in="blur"
               mode="matrix"
               values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-              result="goo" />
+              result="goo"
+            />
             <feBlend in="SourceGraphic" in2="goo" />
           </filter>
         </defs>
@@ -87,57 +97,52 @@ export const BackgroundGradientAnimation = ({
         className={cn(
           "gradients-container h-full w-full blur-lg",
           isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]"
-        )}>
+        )}
+      >
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_var(--first-color)_0,_var(--first-color)_50%)_no-repeat]`,
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:center_center]`,
-            `animate-first`,
-            `opacity-100`
-          )}></div>
+            `[transform-origin:center_center] animate-first opacity-100`
+          )}
+        ></div>
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:calc(50%-400px)]`,
-            `animate-second`,
-            `opacity-100`
-          )}></div>
+            `[transform-origin:calc(50%-400px)] animate-second opacity-100`
+          )}
+        ></div>
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_rgba(var(--third-color),_0.8)_0,_rgba(var(--third-color),_0)_50%)_no-repeat]`,
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:calc(50%+400px)]`,
-            `animate-third`,
-            `opacity-100`
-          )}></div>
+            `[transform-origin:calc(50%+400px)] animate-third opacity-100`
+          )}
+        ></div>
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_rgba(var(--fourth-color),_0.8)_0,_rgba(var(--fourth-color),_0)_50%)_no-repeat]`,
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:calc(50%-200px)]`,
-            `animate-fourth`,
-            `opacity-70`
-          )}></div>
+            `[transform-origin:calc(50%-200px)] animate-fourth opacity-70`
+          )}
+        ></div>
         <div
           className={cn(
             `absolute [background:radial-gradient(circle_at_center,_rgba(var(--fifth-color),_0.8)_0,_rgba(var(--fifth-color),_0)_50%)_no-repeat]`,
             `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
-            `[transform-origin:calc(50%-800px)_calc(50%+800px)]`,
-            `animate-fifth`,
-            `opacity-100`
-          )}></div>
+            `[transform-origin:calc(50%-800px)_calc(50%+800px)] animate-fifth opacity-100`
+          )}
+        ></div>
 
         {interactive && (
           <div
             ref={interactiveRef}
-            onMouseMove={handleMouseMove}
             className={cn(
               `absolute [background:radial-gradient(circle_at_center,_rgba(var(--pointer-color),_0.8)_0,_rgba(var(--pointer-color),_0)_10%)_no-repeat]`,
-              `[mix-blend-mode:var(--blending-value)] w-full h-full -top-1/2 -left-1/2`,
-              `opacity-70`
-            )}></div>
+              `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] opacity-70`
+            )}
+          ></div>
         )}
       </div>
     </div>

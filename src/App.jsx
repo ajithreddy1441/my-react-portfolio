@@ -1,13 +1,12 @@
-import React from 'react'
-import { BackgroundGradientAnimationDemo } from './test'
+import React from "react";
+import { BackgroundGradientAnimationDemo } from "./test";
 
 function App() {
   return (
     <>
-    
-    <BackgroundGradientAnimationDemo />
+      <BackgroundGradientAnimationDemo />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
