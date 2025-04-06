@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Github, Linkedin, Mail, Music2, Sun } from 'lucide-react';
+import Typewriter from 'typewriter-effect';
 
 function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -25,7 +26,17 @@ function Home() {
         {/* Hero Section */}
         <h1 className="text-7xl font-bold mb-6">Ajith Reddy</h1>
         <p className="text-xl text-gray-300 mb-8">
-          Hey! I'm <span className="text-white">Ajith</span>, Front-end Developer<span className="text-white">, Visakhapatnam, India</span>.
+          Hey! I'm <span className="text-white">Ajith</span>,{' '}
+          <div className="bg-gradient-to-r to-yellow-400 from-orange-500 text-black w-max text-[4vw] sm:text-sm lg:text-base py-1 px-2 rounded font-bold"><Typewriter
+            options={{
+              strings: ['Front-end Developer', 'Cyber Security Intern', 'Soc Analyst', ],
+              autoStart: true,
+              loop: true,
+              delay: 75,
+              deleteSpeed: 50,
+            }}
+          />
+          </div>
         </p>
 
         {/* Social Links */}

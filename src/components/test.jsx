@@ -1,6 +1,6 @@
 import React from "react";
-import { BackgroundGradientAnimation } from "./components/background";
-import Home from "./components/Home"; // Import the Home component
+import { BackgroundGradientAnimation } from "./ui/background";
+import Home from "./Home"; // Import the Home component
 
 export function BackgroundGradientAnimationDemo() {
   return (
